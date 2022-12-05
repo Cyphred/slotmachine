@@ -24,10 +24,11 @@ def pull():
 
 def tableCheck(result):
     global tracker
+    global bet_cost
 
     if not isHit(result):
         tracker['Lose'] += 1
-        return -1
+        return -1 * bet_cost
         
     value = result[0]
     if value == '7':
@@ -45,11 +46,11 @@ def tableCheck(result):
     elif value == 'Banana':
         tracker['Banana'] += 1
         tracker['Lose'] += 1
-        return -1
+        return -1 * bet_cost
     elif value == 'Grapes':
         tracker['Grapes'] += 1
         tracker['Lose'] += 1
-        return -1
+        return -1 * bet_cost
 
 def isHit(result):
     if result[0] == result[1] and result[0] == result[2]:
@@ -60,16 +61,23 @@ def main():
     pull_count = 0 # Keeps track of the number of actual pulls
     starting_credits = int(input('Enter the amount of player coins to start with: '))
     player_credits = starting_credits
+    
+    jackpot_limit = int(input('Stop after n hitting the jackpot n times (Enter 0 for no limit): '))
+    jackpot_counter = 0
 
     while player_credits > 0:
         pull_count += 1
-        global bet_cost
-        bets = bet_cost
         result = pull()
         player_credits = player_credits + tableCheck(result)
+        if isHit(result) and result[0] == '7':
+            jackpot_counter += 1
+            if jackpot_limit > 0 and jackpot_counter == jackpot_limit:
+                print(f'Jackpot limit of {jackpot_limit} reached.')
+                break
         
     global tracker
     print(f'Pulled {pull_count} times.')
+    print(f'Game ended with {player_credits} credits left.')
     print(tracker)
 
 if __name__ == "__main__":
